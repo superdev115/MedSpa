@@ -28,8 +28,8 @@ export default class ReportScreen extends React.Component {
         this.state = {
             spinner: false,
             ///////////////
-            fromDate: '',
-            toDate: '',
+            fromDate: getDateString(),
+            toDate: getDateString(),
             errorMessage1: '',
             errorMessage2: '',
             checkedFood: false,
@@ -401,8 +401,7 @@ const styles = EStyleSheet.create({
         borderColor: 'transparent',
     },
     tableContainer: {
-        padding: 15,
-        paddingTop: '30rem',
+        padding: 15
     },
     tableHeader: {
         height: '50rem',
@@ -441,7 +440,7 @@ const styles = EStyleSheet.create({
     buttonsContainer: {
         height: '80rem',
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'flex-start',
         justifyContent: 'space-around'
     },
     backButton: {

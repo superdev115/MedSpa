@@ -30,6 +30,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
+
           // Firebase package
           packages.add(new RNFirebaseAuthPackage());
           packages.add(new RNFirebaseDatabasePackage());

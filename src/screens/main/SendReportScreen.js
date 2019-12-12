@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Image, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
+import {Text, View, Image, SafeAreaView, TouchableOpacity, Alert, Platform} from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {Button, Input} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -93,17 +93,19 @@ export default class SendReportScreen extends React.Component {
 
         let file = await RNHTMLtoPDF.convert(options);
 
+        let from = Platform.OS === 'ios' ? "\"Received Report from MedSpa\" <guru@zaytoona.ie>" : "guru@zaytoona.ie";
         RNSmtpMailer.sendMail({
             mailhost: "smtp.reg365.net",
             port: "465",
             ssl: true,
             username: "zaytoona.ie",
             password: "Smile1975!",
-            from: "\"Received Report from MedSpa\" <guru@zaytoona.ie>",
+            from: from,
             recipients: coachEmail,
             subject: subject,
             htmlBody: "<h3>From : " + email  + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
             attachmentPaths: [file.filePath],
+            attachmentNames: ["report.pdf"],
             attachmentTypes: ["pdf"],
         })
             .then((success) => {
@@ -111,17 +113,33 @@ export default class SendReportScreen extends React.Component {
 
                 this.setState({spinner: false});
 
-                this.props.navigation.goBack();
+                Alert.alert(
+                    'MedSpa',
+                    'The report file was sent to coach successfully.',
+                    [{
+                        text: 'OK',
+                        onPress: () => {
+                            this.props.navigation.goBack();
+                        }
+                    }],
+                    {cancelable: false}
+                );
             })
             .catch((error) => {
                 console.log(error);
 
                 this.setState({spinner: false});
 
-                Snackbar.show({
-                    title: error,
-                    duration: Snackbar.LENGTH_LONG,
-                });
+                Alert.alert(
+                    'MedSpa',
+                    'Failed to send report file to coach.',
+                    [{
+                        text: 'OK',
+                        onPress: () => {
+                        }
+                    }],
+                    {cancelable: false}
+                );
             });
     }
 
@@ -134,7 +152,7 @@ export default class SendReportScreen extends React.Component {
                                          scrollEnabled={true}>
                     <Spinner
                         visible={this.state.spinner}
-                        textContent={'Please wait...'}
+                        textContent={'Sending to Coach...'}
                         overlayColor='rgba(0, 0, 0, 0.5)'
                         textStyle={{color: 'white'}}
                     />
@@ -156,7 +174,7 @@ export default class SendReportScreen extends React.Component {
                             <Text style={{paddingLeft: 20}}>Comment</Text>
                             <Input ref={(input) => { this._commentInput = input; }}
                                    inputContainerStyle={styles.multilineInputStyle}
-                                   inputStyle={styles.inputInnerStyle} multiline={true} numberOfLines={6}
+                                   inputStyle={styles.multilineInnerStyle} multiline={true} numberOfLines={6}
                                    placeholder=''
                                    onChangeText={(comment) => { this.setState({comment}); }}
                                    value={this.state.comment}
@@ -219,16 +237,22 @@ const styles = EStyleSheet.create({
     },
     multilineInputStyle: {
         height: '120rem',
-        textAlignVertical: 'top',
         borderWidth: 1,
         borderColor: 'dodgerblue',
         borderRadius: '10rem',
         marginTop: '5rem',
     },
+    multilineInnerStyle: {
+        height: '120rem',
+        textAlignVertical: 'top',
+        fontSize: '16rem',
+        paddingLeft: '15rem',
+        paddingRight: '25rem',
+    },
     buttonsContainer: {
         height: '80rem',
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         justifyContent: 'space-around',
         marginBottom: '20rem',
     },

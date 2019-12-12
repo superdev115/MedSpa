@@ -32,7 +32,7 @@ export default class AddEditFoodScreen extends React.Component {
             value: '',
             comment: '',
             date: '',
-            time: '',
+            time: new Date(),
 
             errorMessage1: '',
             errorMessage2: '',
@@ -174,7 +174,7 @@ export default class AddEditFoodScreen extends React.Component {
                     <View style={[styles.itemContainer, styles.bigHeight]}>
                         <Text style={styles.labelStyle}>Comments</Text>
                         <Input ref={(input) => { this._commentInput = input; }}
-                               inputContainerStyle={styles.commentInputStyle} inputStyle={styles.inputInnerStyle}
+                               inputContainerStyle={styles.commentInputStyle} inputStyle={styles.commentInnerStyle}
                                onChangeText={(comment) => { this.setState({comment}); }}
                                value={this.state.comment} multiline={true}
                                errorMessage={this.state.errorMessage2} errorStyle={{paddingLeft: 20}} />
@@ -262,13 +262,20 @@ const styles = EStyleSheet.create({
         borderColor: 'dodgerblue',
         borderRadius: '10rem',
     },
+    inputInnerStyle: {
+        fontSize: '16rem',
+        paddingLeft: '15rem',
+        paddingRight: '15rem',
+    },
     commentInputStyle: {
         height: '100rem',
         borderWidth: 1,
         borderColor: 'dodgerblue',
         borderRadius: '10rem',
     },
-    inputInnerStyle: {
+    commentInnerStyle: {
+        height: '100rem',
+        textAlignVertical: 'top',
         fontSize: '16rem',
         paddingLeft: '15rem',
         paddingRight: '15rem',
@@ -294,7 +301,7 @@ const styles = EStyleSheet.create({
     buttonsContainer: {
         height: '80rem',
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'flex-start',
         justifyContent: 'space-around'
     },
     backButton: {

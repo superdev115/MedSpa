@@ -72,8 +72,9 @@ export default class ProfileScreen extends React.Component {
                     this.setState({lastName});
                     this.setState({phone});
 
-                    if (coach) {
+                    if (coach && coach.email != '') {
                         this.setState({hasCoach: true});
+                        this.setState({checkedCoachInfo: true});
                         this.setState({coachName: coach.name});
                         this.setState({coachEmail: coach.email});
                         this.setState({coachPhone: (coach.phone)? coach.phone : ''});
@@ -90,7 +91,13 @@ export default class ProfileScreen extends React.Component {
     }
 
     onCoachInfoCheckBox = () => {
-        this.setState({checkedCoachInfo: !this.state.checkedCoachInfo});
+        this.setState({checkedCoachInfo: !this.state.checkedCoachInfo}, () => {
+            if (!this.state.checkedCoachInfo) {
+                this.setState({coachName: ''});
+                this.setState({coachEmail: ''});
+                this.setState({coachPhone: ''});
+            }
+        });
         this.setState({errorMessage6: ''});
         this.setState({errorMessage7: ''});
         this.setState({errorMessage8: ''});
@@ -113,6 +120,8 @@ export default class ProfileScreen extends React.Component {
         } else {
             this.setState({errorMessage2: ''});
         }
+
+        /*
         if (phone.trim() != '') {
             let phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/;
             if (phoneRegex.test(phone) === false) {
@@ -122,6 +131,7 @@ export default class ProfileScreen extends React.Component {
                 this.setState({errorMessage3: ''});
             }
         }
+        */
 
         if (this.state.checkedChangePassword) {
             if (password.trim() == '') {
@@ -221,24 +231,19 @@ export default class ProfileScreen extends React.Component {
                     updated: new Date(),
                 };
 
-                if (this.state.checkedCoachInfo) {
+                update.coach = {
+                    name: coachName,
+                    email: coachEmail,
+                };
 
-                    update.coach = {
-                        name: coachName,
-                        email: coachEmail,
-                    };
+                if (coachPhone.trim() != '') {
+                    update.coach.phone = coachPhone;
+                }
 
-                    if (phone.trim() != '') {
-                        update.phone = phone;
-                    }
-                    if (coachPhone.trim() != '') {
-                        update.coach.phone = coachPhone;
-                    }
-                    if (this.state.hasCoach) {
-                        update.coach.updated = new Date();
-                    } else {
-                        update.coach.created = new Date();
-                    }
+                if (this.state.hasCoach) {
+                    update.coach.updated = new Date();
+                } else {
+                    update.coach.created = new Date();
                 }
 
                 this.db.ref('users/' + user.uid).update(update).then(() => {
@@ -291,7 +296,7 @@ export default class ProfileScreen extends React.Component {
                                leftIcon={<Icon name='user' style={styles.iconNormalStyle} />}
                                inputStyle={styles.inputInnerStyle}
                                placeholder='Last Name' returnKeyType='next'
-                               onSubmitEditing={() => { this._phoneInput.focus(); }}
+                               onSubmitEditing={() => { this._lastNameInput.blur(); }}
                                blurOnSubmit={false}
                                onChangeText={(lastName) => { this.setState({lastName}); }}
                                value={this.state.lastName}
@@ -299,10 +304,9 @@ export default class ProfileScreen extends React.Component {
                         <Text style={styles.required}>*</Text>
                     </View>
                     <View style={styles.itemContainer}>
-                        <Input ref={(input) => { this._phoneInput = input; }}
-                               inputContainerStyle={styles.inputStyle}
+                        <Input inputContainerStyle={styles.inputStyle}
                                leftIcon={<Icon name='phone' style={styles.iconNormalStyle} />}
-                               inputStyle={styles.inputInnerStyle}
+                               inputStyle={styles.inputInnerStyle} disabled
                                placeholder='Phone' keyboardType='phone-pad' returnKeyType='next'
                                onChangeText={(phone) => { this.setState({phone}); }}
                                value={this.state.phone}

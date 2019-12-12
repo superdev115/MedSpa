@@ -90,7 +90,6 @@ const styles = EStyleSheet.create({
     textStyle: {
         fontSize: '18rem',
         color: '#333',
-        textAlign: 'center',
         lineHeight: '24rem',
     },
     listItemContainer: {
@@ -110,7 +109,9 @@ const styles = EStyleSheet.create({
         lineHeight: '24rem',
     },
     imageContainer: {
-        height: '250rem',
+        width: "100%",
+        aspectRatio: 10/8,
+        resizeMode: 'contain',
         padding: '10rem',
         alignItems: 'center',
         justifyContent: 'center',
@@ -118,8 +119,8 @@ const styles = EStyleSheet.create({
         marginBottom: '30rem',
     },
     image: {
+        width: "100%",
         aspectRatio: 10/8,
-        height: '80%',
         resizeMode: 'contain'
     },
 })

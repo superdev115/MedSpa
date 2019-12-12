@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Image, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
+import {Text, View, Image, SafeAreaView, TouchableOpacity, Alert, Platform} from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {Button, Input} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -8,6 +8,7 @@ import ImagePicker from 'react-native-image-picker';
 import Snackbar from 'react-native-snackbar';
 import firebase from 'react-native-firebase';
 
+var RNGRP = require('react-native-get-real-path');
 import RNSmtpMailer from "react-native-smtp-mailer";
 
 export default class TakePhotoScreen extends React.Component {
@@ -78,8 +79,6 @@ export default class TakePhotoScreen extends React.Component {
 
         ImagePicker.showImagePicker(options, (response) => {
 
-            console.log('Response = ', response);
-
             if (response.didCancel) {
                 console.log('User cancelled image picker');
             } else if (response.error) {
@@ -127,44 +126,109 @@ export default class TakePhotoScreen extends React.Component {
             if (!isValidated) return;
             // End validating...
 
-            console.log(email);
             console.log(coach.email);
 
             this.setState({spinner: true});
 
-            RNSmtpMailer.sendMail({
-                mailhost: "smtp.reg365.net",
-                port: "465",
-                ssl: true,
-                username: "zaytoona.ie",
-                password: "Smile1975!",
-                from: "\"Received Photo from MedSpa\" <guru@zaytoona.ie>",
-                recipients: coach.email,
-                subject: subject,
-                htmlBody: "<h3>From : " + email  + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
-                attachmentPaths: [
-                    photoUri.substr(7)
-                ],
-                attachmentTypes: ["img"] //needed for android, in ios-only application, leave it empty: attachmentTypes:[]. Generally every img(either jpg, png, jpeg or whatever) file should have "img", and every other file should have its corresponding type.
-            })
-                .then((success) => {
-                    console.log(success);
-
-                    this.setState({spinner: false});
-
-                    this.props.navigation.goBack();
+            if (Platform.OS === 'ios') {
+                RNSmtpMailer.sendMail({
+                    mailhost: "smtp.reg365.net",
+                    port: "465",
+                    ssl: true,
+                    username: "zaytoona.ie",
+                    password: "Smile1975!",
+                    from: "\"Received Photo from MedSpa\" <guru@zaytoona.ie>",
+                    recipients: coach.email,
+                    subject: subject,
+                    htmlBody: "<h3>From : " + email + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
+                    attachmentPaths: [photoUri.substring(7)]
                 })
-                .catch((error) => {
-                    console.log(error);
+                    .then((success) => {
+                        console.log(success);
 
-                    this.setState({spinner: false});
+                        this.setState({spinner: false});
 
-                    Snackbar.show({
-                        title: error,
-                        duration: Snackbar.LENGTH_LONG,
+                        Alert.alert(
+                            'MedSpa',
+                            'The photo was sent to coach successfully.',
+                            [{
+                                text: 'OK',
+                                onPress: () => {
+                                    this.props.navigation.goBack();
+                                }
+                            }],
+                            {cancelable: false}
+                        );
+                    })
+                    .catch((error) => {
+                        console.log(error);
+
+                        this.setState({spinner: false});
+
+                        Alert.alert(
+                            'MedSpa',
+                            'Failed to send photo to coach.',
+                            [{
+                                text: 'OK',
+                                onPress: () => {
+                                }
+                            }],
+                            {cancelable: false}
+                        );
                     });
-                });
+            } else {
+                RNGRP.getRealPathFromURI(photoUri).then((filePath) => {
+                    console.log(filePath);
 
+                    RNSmtpMailer.sendMail({
+                        mailhost: "smtp.reg365.net",
+                        port: "465",
+                        ssl: true,
+                        username: "zaytoona.ie",
+                        password: "Smile1975!",
+                        from: "guru@zaytoona.ie",
+                        recipients: coach.email,
+                        subject: subject,
+                        htmlBody: "<h3>From : " + email + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
+                        attachmentPaths: [filePath],
+                        attachmentNames: ["photo.jpg"],
+                        attachmentTypes: ["img"],
+                    })
+                        .then((success) => {
+                            console.log(success);
+
+                            this.setState({spinner: false});
+
+                            Alert.alert(
+                                'MedSpa',
+                                'The photo was sent to coach successfully.',
+                                [{
+                                    text: 'OK',
+                                    onPress: () => {
+                                        this.props.navigation.goBack();
+                                    }
+                                }],
+                                {cancelable: false}
+                            );
+                        })
+                        .catch((error) => {
+                            console.log(error);
+
+                            this.setState({spinner: false});
+
+                            Alert.alert(
+                                'MedSpa',
+                                'Failed to send photo to coach.',
+                                [{
+                                    text: 'OK',
+                                    onPress: () => {
+                                    }
+                                }],
+                                {cancelable: false}
+                            );
+                        });
+                });
+            }
         } else {
             Alert.alert(
                 'MedSpa',
@@ -189,7 +253,7 @@ export default class TakePhotoScreen extends React.Component {
                                          scrollEnabled={true}>
                     <Spinner
                         visible={this.state.spinner}
-                        textContent={'Please wait...'}
+                        textContent={'Sending to Coach...'}
                         overlayColor='rgba(0, 0, 0, 0.5)'
                         textStyle={{color: 'white'}}
                     />
@@ -218,7 +282,7 @@ export default class TakePhotoScreen extends React.Component {
                             <Text style={{paddingLeft: 20}}>Comment</Text>
                             <Input ref={(input) => { this._commentInput = input; }}
                                    inputContainerStyle={styles.multilineInputStyle}
-                                   inputStyle={styles.inputInnerStyle} multiline={true} numberOfLines={6}
+                                   inputStyle={styles.multilineInnerStyle} multiline={true} numberOfLines={6}
                                    placeholder=''
                                    onChangeText={(comment) => { this.setState({comment}); }}
                                    value={this.state.comment}
@@ -281,16 +345,22 @@ const styles = EStyleSheet.create({
     },
     multilineInputStyle: {
         height: '120rem',
-        textAlignVertical: 'top',
         borderWidth: 1,
         borderColor: 'dodgerblue',
         borderRadius: '10rem',
         marginTop: '5rem',
     },
+    multilineInnerStyle: {
+        height: '120rem',
+        textAlignVertical: 'top',
+        fontSize: '16rem',
+        paddingLeft: '15rem',
+        paddingRight: '25rem',
+    },
     buttonsContainer: {
         height: '80rem',
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         justifyContent: 'space-around',
         marginBottom: '20rem',
     },
