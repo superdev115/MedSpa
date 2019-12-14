@@ -96,11 +96,13 @@ class ForgotPasswordScreen extends React.Component {
                 );
             })
             .catch((error) => {
-                this.setState({spinner: false});
-                Snackbar.show({
-                    title: error.message,
-                    duration: Snackbar.LENGTH_LONG,
-                })
+                this.setState({spinner: false}, async () => {
+                    await new Promise((resolve: any) => setTimeout(resolve, 100))
+                    Snackbar.show({
+                        title: error.message,
+                        duration: Snackbar.LENGTH_LONG,
+                    })
+                });
             });
     }
 }

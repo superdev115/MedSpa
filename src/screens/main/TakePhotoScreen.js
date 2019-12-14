@@ -43,6 +43,13 @@ export default class TakePhotoScreen extends React.Component {
         this._subjectInput = null;
         this._commentInput = null;
 
+        this.server = "";
+        this.username = "";
+        this.password = "";
+        this.port = "";
+        this.sender_email = "";
+
+
         this.auth = firebase.auth();
         this.db = firebase.database();
     }
@@ -66,6 +73,17 @@ export default class TakePhotoScreen extends React.Component {
                 }
             });
         }
+
+        this.db.ref('settings/smtp').on('value', (snapshot) => {
+            if (snapshot.val()) {
+                const {server, username, password, port, sender_email} = snapshot.val();
+                this.server = server;
+                this.username = username;
+                this.password = password;
+                this.port = port;
+                this.sender_email = sender_email;
+            }
+        });
     }
 
     onCamera = () => {
@@ -103,7 +121,7 @@ export default class TakePhotoScreen extends React.Component {
     onSubmit = () => {
         const {email, coach, subject, comment, photoUri} = this.state;
 
-        if (coach) {
+        if (coach && coach.email != '') {
 
             // Start validating...
             let isValidated = true;
@@ -132,12 +150,12 @@ export default class TakePhotoScreen extends React.Component {
 
             if (Platform.OS === 'ios') {
                 RNSmtpMailer.sendMail({
-                    mailhost: "smtp.reg365.net",
-                    port: "465",
+                    mailhost: this.server,
+                    port: this.port,
                     ssl: true,
-                    username: "zaytoona.ie",
-                    password: "Smile1975!",
-                    from: "\"Received Photo from MedSpa\" <guru@zaytoona.ie>",
+                    username: this.username,
+                    password: this.password,
+                    from: "\"Received Photo from MedSpa\" <" + this.sender_email + ">",
                     recipients: coach.email,
                     subject: subject,
                     htmlBody: "<h3>From : " + email + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
@@ -146,15 +164,15 @@ export default class TakePhotoScreen extends React.Component {
                     .then((success) => {
                         console.log(success);
 
-                        this.setState({spinner: false});
-
                         Alert.alert(
                             'MedSpa',
                             'The photo was sent to coach successfully.',
                             [{
                                 text: 'OK',
                                 onPress: () => {
-                                    this.props.navigation.goBack();
+                                    this.setState({spinner: false}, ()=> {
+                                        this.props.navigation.goBack();
+                                    });
                                 }
                             }],
                             {cancelable: false}
@@ -163,14 +181,13 @@ export default class TakePhotoScreen extends React.Component {
                     .catch((error) => {
                         console.log(error);
 
-                        this.setState({spinner: false});
-
                         Alert.alert(
                             'MedSpa',
                             'Failed to send photo to coach.',
                             [{
                                 text: 'OK',
                                 onPress: () => {
+                                    this.setState({spinner: false});
                                 }
                             }],
                             {cancelable: false}
@@ -181,12 +198,12 @@ export default class TakePhotoScreen extends React.Component {
                     console.log(filePath);
 
                     RNSmtpMailer.sendMail({
-                        mailhost: "smtp.reg365.net",
-                        port: "465",
+                        mailhost: this.server,
+                        port: this.port,
                         ssl: true,
-                        username: "zaytoona.ie",
-                        password: "Smile1975!",
-                        from: "guru@zaytoona.ie",
+                        username: this.username,
+                        password: this.password,
+                        from: this.sender_email,
                         recipients: coach.email,
                         subject: subject,
                         htmlBody: "<h3>From : " + email + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
@@ -197,15 +214,15 @@ export default class TakePhotoScreen extends React.Component {
                         .then((success) => {
                             console.log(success);
 
-                            this.setState({spinner: false});
-
                             Alert.alert(
                                 'MedSpa',
                                 'The photo was sent to coach successfully.',
                                 [{
                                     text: 'OK',
                                     onPress: () => {
-                                        this.props.navigation.goBack();
+                                        this.setState({spinner: false}, ()=> {
+                                            this.props.navigation.goBack();
+                                        });
                                     }
                                 }],
                                 {cancelable: false}
@@ -214,14 +231,13 @@ export default class TakePhotoScreen extends React.Component {
                         .catch((error) => {
                             console.log(error);
 
-                            this.setState({spinner: false});
-
                             Alert.alert(
                                 'MedSpa',
                                 'Failed to send photo to coach.',
                                 [{
                                     text: 'OK',
                                     onPress: () => {
+                                        this.setState({spinner: false});
                                     }
                                 }],
                                 {cancelable: false}

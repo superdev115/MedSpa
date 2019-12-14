@@ -48,7 +48,12 @@ export default createAppContainer(
     createSwitchNavigator(
         {
             Landing: createStackNavigator({
-                Landing: LandingScreen,
+                Landing: {
+                    screen: LandingScreen,
+                    navigationOptions: {
+                        header: null,
+                    }
+                },
                 Booking: BookingScreen,
             }),
             CreateNew: createStackNavigator({

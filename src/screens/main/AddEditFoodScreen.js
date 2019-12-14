@@ -8,6 +8,7 @@ import DatePicker from 'react-native-datepicker';
 
 import firebase from "react-native-firebase";
 import Snackbar from "react-native-snackbar";
+import {getTimeString} from "../../utils/Utils";
 
 export default class AddEditFoodScreen extends React.Component {
     static navigationOptions = (navBar) => {
@@ -32,7 +33,7 @@ export default class AddEditFoodScreen extends React.Component {
             value: '',
             comment: '',
             date: '',
-            time: new Date(),
+            time: getTimeString(),
 
             errorMessage1: '',
             errorMessage2: '',
@@ -210,7 +211,7 @@ export default class AddEditFoodScreen extends React.Component {
                                         btnTextConfirm: {color: 'mediumvioletred'},
                                         btnTextCancel: {color: 'lightseagreen'},
                                     }}
-                                    onDateChange={(time) => {this.setState({time: time})}} />
+                                    onDateChange={(time) => {this.setState({time})}} />
                         <Text style={styles.errorStyle}>{this.state.errorMessage4}</Text>
                     </View>
 

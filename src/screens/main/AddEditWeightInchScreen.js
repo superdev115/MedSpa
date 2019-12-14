@@ -9,6 +9,7 @@ import { Dropdown } from 'react-native-material-dropdown';
 
 import firebase from "react-native-firebase";
 import Snackbar from "react-native-snackbar";
+import {getTimeString} from "../../utils/Utils";
 
 export default class AddEditWeightInchScreen extends React.Component {
     static navigationOptions = (navBar) => {
@@ -39,7 +40,7 @@ export default class AddEditWeightInchScreen extends React.Component {
             inches: '',
             comment: '',
             date: '',
-            time: new Date(),
+            time: getTimeString(),
 
             errorMessage1: '',
             errorMessage2: '',

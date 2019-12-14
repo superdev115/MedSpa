@@ -15,6 +15,7 @@ export default class DrawerMenuPanel extends React.Component {
 
     state = {
         userName: '',
+        userEmail: '',
     }
 
     componentDidMount() {
@@ -22,8 +23,9 @@ export default class DrawerMenuPanel extends React.Component {
         if (user) {
             firebase.database().ref('users/' + user.uid).on('value', (snapshot) => {
                 if (snapshot.val()) {
-                    const {firstName, lastName} = snapshot.val();
+                    const {firstName, lastName, email} = snapshot.val();
                     this.setState({userName: firstName + ' ' + lastName});
+                    this.setState({userEmail: email});
                 }
             });
         }
@@ -38,6 +40,9 @@ export default class DrawerMenuPanel extends React.Component {
                 </View>
                 <View style={styles.nameContainer}>
                     <Text style={styles.nameText}>{this.state.userName}</Text>
+                </View>
+                <View style={styles.emailContainer}>
+                    <Text style={styles.emailText}>{this.state.userEmail}</Text>
                 </View>
 
                 <View style={styles.menuContainer}>
@@ -110,13 +115,21 @@ const styles = EStyleSheet.create({
         resizeMode: 'contain'
     },
     nameContainer: {
-        height: '40rem',
+        height: '30rem',
         alignItems: 'center',
         justifyContent: 'flex-start',
     },
     nameText: {
         fontSize: '20rem',
         color: 'darkgreen',
+    },
+    emailContainer: {
+        height: '30rem',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+    emailText: {
+        fontSize: '12rem',
     },
     menuContainer: {
         flex: 1,

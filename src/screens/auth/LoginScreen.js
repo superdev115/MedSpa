@@ -63,7 +63,7 @@ class LoginScreen extends React.Component {
         return (
             <SafeAreaView style={{flex: 1,}}>
                 <KeyboardAwareScrollView contentContainerStyle={styles.container} enableOnAndroid={true}
-                                         enableAutomaticScroll={(Platform.OS === 'ios')}>
+                                         enableAutomaticScroll={true}>
                     <Spinner visible={this.state.spinner}
                              textContent={'Please wait...'}
                              overlayColor="rgba(0, 0, 0, 0.5)"
@@ -156,10 +156,12 @@ class LoginScreen extends React.Component {
                             });
                         })
                         .catch((error) => {
-                            this.setState({spinner: false});
-                            Snackbar.show({
-                                title: error.message,
-                                duration: Snackbar.LENGTH_LONG,
+                            this.setState({spinner: false}, async () => {
+                                await new Promise((resolve: any) => setTimeout(resolve, 100))
+                                Snackbar.show({
+                                    title: error.message,
+                                    duration: Snackbar.LENGTH_LONG,
+                                })
                             });
                         });
                 } else {
@@ -177,11 +179,13 @@ class LoginScreen extends React.Component {
                 }
             })
             .catch((error) => {
-                this.setState({spinner: false});
-                Snackbar.show({
-                    title: error.message,
-                    duration: Snackbar.LENGTH_LONG,
-                })
+                this.setState({spinner: false}, async () => {
+                    await new Promise((resolve: any) => setTimeout(resolve, 100))
+                    Snackbar.show({
+                        title: error.message,
+                        duration: Snackbar.LENGTH_LONG,
+                    })
+                });
             });
     }
 

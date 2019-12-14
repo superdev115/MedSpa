@@ -207,7 +207,7 @@ export default class ReportScreen extends React.Component {
 
     onSendToCoach = () => {
         if (this.state.tableData.length > 0) {
-            if (this.coach) {
+            if (this.coach && this.coach.email != '') {
                 let {fromDate, toDate} = this.state;
                 let params = {
                     email: this.email,

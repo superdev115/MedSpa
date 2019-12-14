@@ -4,10 +4,10 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import {Button, Input} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import Snackbar from 'react-native-snackbar';
 
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNSmtpMailer from 'react-native-smtp-mailer';
+import firebase from "react-native-firebase";
 
 export default class SendReportScreen extends React.Component {
     static navigationOptions = {
@@ -31,13 +31,32 @@ export default class SendReportScreen extends React.Component {
             errorMessage2: '',
         }
 
+        this.server = "";
+        this.username = "";
+        this.password = "";
+        this.port = "";
+        this.sender_email = "";
+
         this._subjectInput = null;
         this._commentInput = null;
+
+        this.db = firebase.database();
     }
 
     componentDidMount() {
         const { subject } = this.props.navigation.state.params;
         this.setState({subject});
+
+        this.db.ref('settings/smtp').on('value', (snapshot) => {
+            if (snapshot.val()) {
+                const {server, username, password, port, sender_email} = snapshot.val();
+                this.server = server;
+                this.username = username;
+                this.password = password;
+                this.port = port + '';
+                this.sender_email = sender_email;
+            }
+        });
     }
 
     onSubmit = async () => {
@@ -93,13 +112,13 @@ export default class SendReportScreen extends React.Component {
 
         let file = await RNHTMLtoPDF.convert(options);
 
-        let from = Platform.OS === 'ios' ? "\"Received Report from MedSpa\" <guru@zaytoona.ie>" : "guru@zaytoona.ie";
+        let from = Platform.OS === 'ios' ? "\"Received Report from MedSpa\" <" + this.sender_email + ">" : this.sender_email;
         RNSmtpMailer.sendMail({
-            mailhost: "smtp.reg365.net",
-            port: "465",
+            mailhost: this.server,
+            port: this.port,
             ssl: true,
-            username: "zaytoona.ie",
-            password: "Smile1975!",
+            username: this.username,
+            password: this.password,
             from: from,
             recipients: coachEmail,
             subject: subject,
@@ -111,15 +130,15 @@ export default class SendReportScreen extends React.Component {
             .then((success) => {
                 console.log(success);
 
-                this.setState({spinner: false});
-
                 Alert.alert(
                     'MedSpa',
                     'The report file was sent to coach successfully.',
                     [{
                         text: 'OK',
                         onPress: () => {
-                            this.props.navigation.goBack();
+                            this.setState({spinner: false}, ()=> {
+                                this.props.navigation.goBack();
+                            });
                         }
                     }],
                     {cancelable: false}
@@ -128,14 +147,13 @@ export default class SendReportScreen extends React.Component {
             .catch((error) => {
                 console.log(error);
 
-                this.setState({spinner: false});
-
                 Alert.alert(
                     'MedSpa',
                     'Failed to send report file to coach.',
                     [{
                         text: 'OK',
                         onPress: () => {
+                            this.setState({spinner: false});
                         }
                     }],
                     {cancelable: false}

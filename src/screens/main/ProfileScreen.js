@@ -6,8 +6,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Spinner from 'react-native-loading-spinner-overlay';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
-import firebase from "react-native-firebase";
-import Snackbar from "react-native-snackbar";
+import firebase from 'react-native-firebase';
+import Snackbar from 'react-native-snackbar';
 
 export default class ProfileScreen extends React.Component {
     static navigationOptions = {
@@ -121,7 +121,6 @@ export default class ProfileScreen extends React.Component {
             this.setState({errorMessage2: ''});
         }
 
-        /*
         if (phone.trim() != '') {
             let phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/;
             if (phoneRegex.test(phone) === false) {
@@ -131,7 +130,6 @@ export default class ProfileScreen extends React.Component {
                 this.setState({errorMessage3: ''});
             }
         }
-        */
 
         if (this.state.checkedChangePassword) {
             if (password.trim() == '') {
@@ -228,6 +226,7 @@ export default class ProfileScreen extends React.Component {
                 let update = {
                     firstName: firstName ,
                     lastName: lastName,
+                    phone: phone,
                     updated: new Date(),
                 };
 
@@ -296,7 +295,7 @@ export default class ProfileScreen extends React.Component {
                                leftIcon={<Icon name='user' style={styles.iconNormalStyle} />}
                                inputStyle={styles.inputInnerStyle}
                                placeholder='Last Name' returnKeyType='next'
-                               onSubmitEditing={() => { this._lastNameInput.blur(); }}
+                               onSubmitEditing={() => { this._phoneInput.focus(); }}
                                blurOnSubmit={false}
                                onChangeText={(lastName) => { this.setState({lastName}); }}
                                value={this.state.lastName}
@@ -304,9 +303,10 @@ export default class ProfileScreen extends React.Component {
                         <Text style={styles.required}>*</Text>
                     </View>
                     <View style={styles.itemContainer}>
-                        <Input inputContainerStyle={styles.inputStyle}
+                        <Input ref={(input) => { this._phoneInput = input; }}
+                               inputContainerStyle={styles.inputStyle}
                                leftIcon={<Icon name='phone' style={styles.iconNormalStyle} />}
-                               inputStyle={styles.inputInnerStyle} disabled
+                               inputStyle={styles.inputInnerStyle}
                                placeholder='Phone' keyboardType='phone-pad' returnKeyType='next'
                                onChangeText={(phone) => { this.setState({phone}); }}
                                value={this.state.phone}

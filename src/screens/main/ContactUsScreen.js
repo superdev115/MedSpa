@@ -152,7 +152,7 @@ export default class ContactUsScreen extends React.Component {
                         <View style={styles.itemContainer}>
                             <Input ref={(input) => { this._messageInput = input; }}
                                    inputContainerStyle={styles.multilineInputStyle}
-                                   inputStyle={styles.inputInnerStyle} multiline={true} numberOfLines={6}
+                                   inputStyle={styles.multilineInnerStyle} multiline={true} numberOfLines={6}
                                    placeholder='Message'
                                    onChangeText={(message) => { this.setState({message}); }}
                                    value={this.state.message}
@@ -212,11 +212,17 @@ const styles = EStyleSheet.create({
     },
     multilineInputStyle: {
         height: '120rem',
-        textAlignVertical: 'top',
         borderWidth: 1,
         borderColor: 'dodgerblue',
         borderRadius: '10rem',
         marginTop: '15rem',
+    },
+    multilineInnerStyle: {
+        height: '120rem',
+        textAlignVertical: 'top',
+        fontSize: '16rem',
+        paddingLeft: '15rem',
+        paddingRight: '25rem',
     },
     buttonsContainer: {
         height: '80rem',
