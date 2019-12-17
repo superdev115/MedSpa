@@ -55,11 +55,20 @@ export default class AddEditWaterScreen extends React.Component {
 
         this.db.ref('amounts/water').once('value', (snapshot) => {
             if (snapshot.val()) {
-                const {minValue, noOfSteps, stepSize, unit} = snapshot.val();
+                const {options, minValue, noOfSteps, stepSize, unit} = snapshot.val();
+
                 let sizeOptions = [];
-                for (let w = 0; w <= noOfSteps; w++) {
-                    let value = minValue + w * stepSize;
-                    sizeOptions.push({value});
+                if (options) {
+                    options.forEach((value) => {
+                        if (value) {
+                            sizeOptions.push({value});
+                        }
+                    });
+                } else {
+                    for (let w = 0; w <= noOfSteps; w++) {
+                        let value = minValue + w * stepSize;
+                        sizeOptions.push({value});
+                    }
                 }
                 this.setState({sizeOptions});
                 this.setState({unit});

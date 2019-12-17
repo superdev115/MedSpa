@@ -80,8 +80,8 @@ export default class TakePhotoScreen extends React.Component {
                 this.server = server;
                 this.username = username;
                 this.password = password;
-                this.port = port;
-                this.sender_email = sender_email;
+                this.port = port + '';
+                //this.sender_email = sender_email;
             }
         });
     }
@@ -155,7 +155,7 @@ export default class TakePhotoScreen extends React.Component {
                     ssl: true,
                     username: this.username,
                     password: this.password,
-                    from: "\"Received Photo from MedSpa\" <" + this.sender_email + ">",
+                    from: "\"Received Photo from MedSpa\" <" + email + ">",
                     recipients: coach.email,
                     subject: subject,
                     htmlBody: "<h3>From : " + email + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),
@@ -203,7 +203,7 @@ export default class TakePhotoScreen extends React.Component {
                         ssl: true,
                         username: this.username,
                         password: this.password,
-                        from: this.sender_email,
+                        from: email,
                         recipients: coach.email,
                         subject: subject,
                         htmlBody: "<h3>From : " + email + "</h3>" + (comment.trim() == '' ? "" : "<p>Comment : " + comment + "</p>"),

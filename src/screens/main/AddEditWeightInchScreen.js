@@ -59,12 +59,24 @@ export default class AddEditWeightInchScreen extends React.Component {
 
         this.db.ref('amounts/weight').once('value', (snapshot) => {
             if (snapshot.val()) {
-                const {minValue, noOfSteps, stepSize, unit} = snapshot.val();
+                const {options, minValue, noOfSteps, stepSize, unit} = snapshot.val();
                 let weightOptions = [];
-                for (let w = 0; w <= noOfSteps; w++) {
-                    let value = minValue + w * stepSize;
-                    weightOptions.push({value});
+
+                if (options) {
+                    options.forEach((value) => {
+                        if (value) {
+                            weightOptions.push({value});
+                        }
+                    });
+                } else {
+                    for (let w = 0; w <= noOfSteps; w++) {
+                        let value = minValue + w * stepSize;
+                        weightOptions.push({value});
+                    }
                 }
+
+                console.log(weightOptions);
+
                 this.setState({weightOptions});
                 this.setState({weightUnit: unit});
             }
@@ -72,12 +84,22 @@ export default class AddEditWeightInchScreen extends React.Component {
 
         this.db.ref('amounts/inch').once('value', (snapshot) => {
             if (snapshot.val()) {
-                const {minValue, noOfSteps, stepSize, unit} = snapshot.val();
-                let inchOptions = []
-                for (let i = 0; i <= noOfSteps; i++) {
-                    let value = minValue + i * stepSize;
-                    inchOptions.push({value});
+                const {options, minValue, noOfSteps, stepSize, unit} = snapshot.val();
+                let inchOptions = [];
+
+                if (options) {
+                    options.forEach((value) => {
+                        if (value) {
+                            inchOptions.push({value});
+                        }
+                    });
+                } else {
+                    for (let i = 0; i <= noOfSteps; i++) {
+                        let value = minValue + i * stepSize;
+                        inchOptions.push({value});
+                    }
                 }
+
                 this.setState({inchOptions});
                 this.setState({inchUnit: unit});
             }

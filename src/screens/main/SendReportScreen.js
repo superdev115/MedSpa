@@ -44,7 +44,7 @@ export default class SendReportScreen extends React.Component {
     }
 
     componentDidMount() {
-        const { subject } = this.props.navigation.state.params;
+        const { email, subject } = this.props.navigation.state.params;
         this.setState({subject});
 
         this.db.ref('settings/smtp').on('value', (snapshot) => {
@@ -54,7 +54,7 @@ export default class SendReportScreen extends React.Component {
                 this.username = username;
                 this.password = password;
                 this.port = port + '';
-                this.sender_email = sender_email;
+                //this.sender_email = sender_email;
             }
         });
     }
@@ -112,7 +112,7 @@ export default class SendReportScreen extends React.Component {
 
         let file = await RNHTMLtoPDF.convert(options);
 
-        let from = Platform.OS === 'ios' ? "\"Received Report from MedSpa\" <" + this.sender_email + ">" : this.sender_email;
+        let from = Platform.OS === 'ios' ? "\"Received Report from MedSpa\" <" + email + ">" : email;
         RNSmtpMailer.sendMail({
             mailhost: this.server,
             port: this.port,
