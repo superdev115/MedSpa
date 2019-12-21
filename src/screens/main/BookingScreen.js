@@ -1,14 +1,11 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Image} from 'react-native';
-import PropTypes from 'prop-types';
+import { SafeAreaView, Image} from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { Icon } from 'react-native-elements';
 
-import SegmentedControlTab from 'react-native-segmented-control-tab';
+import Spinner from 'react-native-loading-spinner-overlay';
+import {WebView} from 'react-native-webview';
 
-import Moment from 'moment';
-import Spinner from "react-native-loading-spinner-overlay";
-import {WebView} from "react-native-webview";
+import firebase from 'react-native-firebase';
 
 export default class BookingScreen extends React.Component {
     static navigationOptions = {
@@ -24,8 +21,22 @@ export default class BookingScreen extends React.Component {
         super(props);
 
         this.state = {
-            loading: true,
+            loading: false,
+            booking_uri: '',
         };
+
+        this.db = firebase.database();
+    }
+
+    componentDidMount() {
+        this.db.ref('settings').on('value', (snapshot) => {
+            if (snapshot.val()) {
+                const {booking_uri} = snapshot.val();
+
+                this.setState({loading: true});
+                this.setState({booking_uri});
+            }
+        });
     }
 
     hideSpinner() {
@@ -39,7 +50,7 @@ export default class BookingScreen extends React.Component {
                          overlayColor={{color: 'white'}}
                          color={'cadetblue'} />
                 <WebView style={{ flex: 1, }}
-                         source={{ uri: "https://web2.myaestheticspro.com/booknow/index.cfm?53FD14C9E55FEC061C611199D522BE6D" }}
+                         source={{ uri: this.state.booking_uri }}
                          onLoad={() => (this.hideSpinner())}
                 />
             </SafeAreaView>

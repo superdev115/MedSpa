@@ -5,7 +5,6 @@ import {Button, Input} from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ImagePicker from 'react-native-image-picker';
-import Snackbar from 'react-native-snackbar';
 import firebase from 'react-native-firebase';
 
 var RNGRP = require('react-native-get-real-path');
